@@ -350,6 +350,8 @@ export const t = {
     lowStockAlert: "कम / खत्म स्टॉक अलर्ट",
     items: "आइटम",
     reorder: "री-ऑर्डर",
+    udhaarLedger: "उधार बही",
+    sendReminder: "रिमाइंडर भेजें",
     addProduct: "प्रोडक्ट जोड़ें",
     refresh: "ताज़ा करें",
 
