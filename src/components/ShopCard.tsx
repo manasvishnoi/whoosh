@@ -6,7 +6,7 @@ interface ShopCardProps {
   shop: Shop;
 }
 
-const PLAN_STYLES: Record<string, { label: string; bg: string; text: string }> = {
+const PLAN_STYLES: Record<"starter" | "pro" | "elite", { label: string; bg: string; text: string }> = {
   elite: { label: "Elite", bg: "bg-purple-100", text: "text-purple-700" },
   pro:   { label: "Pro",   bg: "bg-orange-100", text: "text-orange-700" },
   starter: { label: "Starter", bg: "bg-slate-100", text: "text-slate-600" },
