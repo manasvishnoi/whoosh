@@ -1,106 +1,94 @@
 import Link from "next/link";
-import { Star, Clock, MapPin, Zap, MessageCircle, ChevronRight } from "lucide-react";
+import { Star, Clock, MapPin, Zap, MessageCircle, ArrowRight } from "lucide-react";
 import type { Shop } from "@/lib/data";
 
 interface ShopCardProps {
   shop: Shop;
 }
 
-const PLAN_BADGES: Record<string, { label: string; bg: string; text: string }> = {
+const PLAN_STYLES: Record<string, { label: string; bg: string; text: string }> = {
   elite: { label: "Elite", bg: "bg-purple-100", text: "text-purple-700" },
-  pro: { label: "Pro", bg: "bg-orange-100", text: "text-orange-700" },
-  starter: { label: "Starter", bg: "bg-gray-100", text: "text-gray-600" },
+  pro:   { label: "Pro",   bg: "bg-orange-100", text: "text-orange-700" },
+  starter: { label: "Starter", bg: "bg-slate-100", text: "text-slate-600" },
 };
 
 export default function ShopCard({ shop }: ShopCardProps) {
-  const plan = PLAN_BADGES[shop.plan];
+  const plan = PLAN_STYLES[shop.plan];
 
   return (
     <Link href={`/shop/${shop.id}`} className="block group">
-      <div className="bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-200 group-hover:-translate-y-0.5">
+      <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm
+        transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-lg group-hover:border-orange-100">
+
         {/* Banner */}
-        <div className="relative h-40 overflow-hidden bg-gradient-to-br from-orange-50 to-purple-50">
+        <div className="relative h-36 overflow-hidden">
           <img
             src={shop.banner}
             alt={shop.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
-          {/* Open/Closed badge */}
-          <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-semibold ${shop.isOpen ? "bg-green-500 text-white" : "bg-gray-800/80 text-gray-200"}`}>
-            {shop.isOpen ? "Open" : "Closed"}
+          {/* Status */}
+          <div className={`absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-sm
+            ${shop.isOpen ? "bg-emerald-500/90 text-white" : "bg-black/60 text-gray-300"}`}>
+            {shop.isOpen ? "● Open" : "Closed"}
           </div>
 
-          {/* Plan badge */}
-          <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-semibold ${plan.bg} ${plan.text}`}>
+          {/* Plan */}
+          <div className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-sm bg-white/90 ${plan.text}`}>
             {plan.label}
           </div>
 
           {/* Logo */}
-          <div className="absolute bottom-0 left-4 translate-y-1/2">
-            <img
-              src={shop.logo}
-              alt={shop.name}
-              className="w-14 h-14 rounded-2xl border-2 border-white shadow-md object-cover bg-white"
-            />
-          </div>
+          <img
+            src={shop.logo}
+            alt=""
+            className="absolute bottom-0 left-3 translate-y-1/2 w-12 h-12 rounded-xl border-2 border-white shadow-md object-cover bg-white"
+          />
         </div>
 
         {/* Content */}
-        <div className="p-4 pt-10">
-          {/* Name + rating */}
-          <div className="flex items-start justify-between gap-2 mb-1">
+        <div className="p-3 pt-8">
+          <div className="flex items-start justify-between gap-2 mb-2">
             <div className="min-w-0">
-              <h3 className="font-bold text-whoosh-dark text-base leading-tight truncate">
-                {shop.name}
-              </h3>
-              <p className="text-xs text-whoosh-muted hindi mt-0.5">{shop.hindiName}</p>
+              <h3 className="font-bold text-[#0F172A] text-sm leading-tight truncate">{shop.name}</h3>
+              <p className="text-[10px] text-[#94A3B8] hindi truncate mt-0.5">{shop.hindiName}</p>
             </div>
-            <div className="flex items-center gap-1 shrink-0 bg-green-50 px-2 py-1 rounded-lg">
-              <Star className="w-3.5 h-3.5 text-green-600 fill-green-600" />
-              <span className="text-sm font-bold text-green-700">{shop.rating}</span>
-              <span className="text-xs text-green-600">({shop.reviewCount})</span>
+            <div className="flex items-center gap-0.5 shrink-0 bg-emerald-50 px-1.5 py-1 rounded-lg">
+              <Star className="w-3 h-3 text-emerald-600 fill-emerald-600" />
+              <span className="text-xs font-black text-emerald-700">{shop.rating}</span>
             </div>
           </div>
 
           {/* Tags */}
-          <div className="flex gap-1.5 flex-wrap mb-3">
+          <div className="flex gap-1 flex-wrap mb-2.5">
             {shop.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="text-xs text-whoosh-muted bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full">
+              <span key={tag} className="text-[10px] text-[#64748B] bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-full">
                 {tag}
               </span>
             ))}
           </div>
 
-          {/* Delivery info */}
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 text-whoosh-muted">
-                <Clock className="w-3.5 h-3.5" />
-                <span className="text-xs">{shop.eta}</span>
-              </div>
-              <div className="flex items-center gap-1 text-whoosh-muted">
-                <MapPin className="w-3.5 h-3.5" />
-                <span className="text-xs">{shop.distance}</span>
-              </div>
+          {/* Meta */}
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2.5 text-[#64748B]">
+              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{shop.eta}</span>
+              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{shop.distance}</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Zap className="w-3.5 h-3.5 text-whoosh-green fill-whoosh-green" />
-              <span className="text-xs font-bold text-whoosh-green">Free Delivery</span>
-            </div>
+            <span className="flex items-center gap-0.5 font-bold text-emerald-600">
+              <Zap className="w-3 h-3 fill-emerald-500 text-emerald-500" />Free
+            </span>
           </div>
 
-          {/* Bottom CTA */}
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
-            <div className="flex items-center gap-1">
-              <MessageCircle className="w-3.5 h-3.5 text-green-500" />
-              <span className="text-xs text-whoosh-muted">WhatsApp order</span>
-            </div>
-            <div className="flex items-center gap-1 text-whoosh-orange font-semibold text-xs group-hover:gap-2 transition-all">
-              Shop now <ChevronRight className="w-3.5 h-3.5" />
-            </div>
+          {/* Footer */}
+          <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-gray-50">
+            <span className="flex items-center gap-1 text-[10px] text-[#64748B]">
+              <MessageCircle className="w-3 h-3 text-green-500" />WhatsApp
+            </span>
+            <span className="flex items-center gap-0.5 text-[#FF8C42] font-bold text-xs group-hover:gap-1 transition-all duration-150">
+              Shop now <ArrowRight className="w-3 h-3" />
+            </span>
           </div>
         </div>
       </div>

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { MapPin, Search, ShoppingCart, Menu, X, ChevronDown, Zap } from "lucide-react";
+import { MapPin, ShoppingCart, Menu, X, Zap, ChevronDown } from "lucide-react";
+import { useLang } from "@/context/LanguageContext";
 
 interface NavbarProps {
   cartCount?: number;
@@ -10,95 +11,101 @@ interface NavbarProps {
 }
 
 export default function Navbar({ cartCount = 0, variant = "landing" }: NavbarProps) {
+  const { lang, toggleLang, T } = useLang();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [langHindi, setLangHindi] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-md" : "bg-white border-b border-gray-100"}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
+
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center shadow-orange">
+          <Link href="/" className="flex items-center gap-2 shrink-0 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF8C42] to-[#E87030] flex items-center justify-center shadow-orange transition-transform duration-200 group-hover:scale-110 group-hover:rotate-3">
               <Zap className="w-5 h-5 text-white fill-white" />
             </div>
-            <span className="text-xl font-black text-whoosh-dark tracking-tight">
-              Whoosh
-            </span>
+            <span className="text-xl font-black text-[#0F172A] tracking-tight">Whoosh</span>
           </Link>
 
-          {/* Location (shop/discovery pages) */}
+          {/* Location pill */}
           {variant !== "landing" && (
-            <button className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-50 hover:bg-orange-100 transition-colors text-sm font-medium text-whoosh-dark">
-              <MapPin className="w-4 h-4 text-whoosh-orange" />
+            <button className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-50 hover:bg-orange-100 transition-colors text-sm font-semibold text-[#1E293B] border border-orange-100">
+              <MapPin className="w-3.5 h-3.5 text-[#FF8C42]" />
               <span>Lucknow, UP</span>
-              <ChevronDown className="w-3.5 h-3.5 text-whoosh-muted" />
+              <ChevronDown className="w-3 h-3 text-[#64748B]" />
             </button>
           )}
 
-          {/* Center nav links */}
-          <div className="hidden md:flex items-center gap-6">
-            {variant === "landing" && (
-              <>
-                <Link href="/shops" className="text-sm font-medium text-whoosh-muted hover:text-whoosh-dark transition-colors">
-                  {langHindi ? "दुकानें" : "Browse Shops"}
+          {/* Center links */}
+          {variant === "landing" && (
+            <div className="hidden md:flex items-center gap-1">
+              {[
+                { label: T.browseShops, href: "/shops" },
+                { label: T.howItWorks, href: "/#how-it-works" },
+                { label: T.pricing, href: "/#pricing" },
+              ].map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="px-3 py-2 rounded-xl text-sm font-medium text-[#64748B] hover:text-[#0F172A] hover:bg-gray-50 transition-all duration-150"
+                >
+                  {item.label}
                 </Link>
-                <Link href="/#how-it-works" className="text-sm font-medium text-whoosh-muted hover:text-whoosh-dark transition-colors">
-                  {langHindi ? "कैसे काम करता है" : "How it works"}
-                </Link>
-                <Link href="/#pricing" className="text-sm font-medium text-whoosh-muted hover:text-whoosh-dark transition-colors">
-                  {langHindi ? "मूल्य" : "Pricing"}
-                </Link>
-              </>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* Right actions */}
           <div className="flex items-center gap-2">
             {/* Language toggle */}
             <button
-              onClick={() => setLangHindi(!langHindi)}
-              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 hover:border-orange-300 transition-colors text-whoosh-muted hover:text-whoosh-orange"
+              onClick={toggleLang}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold border transition-all duration-200 active:scale-95"
+              style={lang === "hi"
+                ? { background: "#6B46C1", color: "#fff", borderColor: "#6B46C1" }
+                : { background: "#fff", color: "#6B46C1", borderColor: "#DDD6FE" }
+              }
+              title={lang === "en" ? "Switch to Hindi" : "Switch to English"}
             >
-              {langHindi ? "EN" : "हिं"}
+              {lang === "en" ? "हिं" : "EN"}
             </button>
-
-            {variant !== "landing" && (
-              <button className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors">
-                <Search className="w-5 h-5 text-whoosh-dark" />
-              </button>
-            )}
 
             {/* Cart */}
             {cartCount > 0 && (
-              <button className="flex items-center gap-2 bg-whoosh-orange hover:bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-orange hover:shadow-orange">
+              <button className="flex items-center gap-2 bg-[#FF8C42] hover:brightness-105 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-orange active:scale-95">
                 <ShoppingCart className="w-4 h-4" />
-                <span>{cartCount} items</span>
+                <span>{cartCount}</span>
               </button>
             )}
 
-            {/* CTAs */}
             {variant === "landing" && (
-              <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2">
                 <Link
                   href="/dashboard"
-                  className="hidden sm:block text-sm font-semibold text-whoosh-purple hover:text-purple-700 transition-colors px-3 py-1.5"
+                  className="text-sm font-semibold text-[#6B46C1] hover:text-purple-800 px-3 py-2 rounded-xl hover:bg-purple-50 transition-all duration-150"
                 >
-                  For Shops
+                  {T.forShops}
                 </Link>
                 <Link
                   href="/shops"
-                  className="bg-whoosh-orange hover:bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-orange"
+                  className="bg-[#FF8C42] hover:brightness-105 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-orange active:scale-95"
                 >
-                  Order Now
+                  {T.orderNow}
                 </Link>
               </div>
             )}
 
-            {/* Mobile menu */}
             <button
-              className="md:hidden p-2 rounded-xl hover:bg-gray-100"
+              className="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors active:scale-95"
               onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Menu"
             >
               {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -107,21 +114,21 @@ export default function Navbar({ cartCount = 0, variant = "landing" }: NavbarPro
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100 space-y-1">
-            <Link href="/shops" className="block px-4 py-2.5 rounded-xl hover:bg-orange-50 text-sm font-medium text-whoosh-dark" onClick={() => setMenuOpen(false)}>
-              Browse Shops
+          <div className="md:hidden py-3 border-t border-gray-100 space-y-1 animate-fade-up">
+            <Link href="/shops" className="flex items-center px-4 py-3 rounded-xl hover:bg-orange-50 text-sm font-semibold text-[#1E293B] transition-colors" onClick={() => setMenuOpen(false)}>
+              {T.browseShops}
             </Link>
-            <Link href="/#how-it-works" className="block px-4 py-2.5 rounded-xl hover:bg-orange-50 text-sm font-medium text-whoosh-dark" onClick={() => setMenuOpen(false)}>
-              How it works
+            <Link href="/#how-it-works" className="flex items-center px-4 py-3 rounded-xl hover:bg-orange-50 text-sm font-medium text-[#1E293B] transition-colors" onClick={() => setMenuOpen(false)}>
+              {T.howItWorks}
             </Link>
-            <Link href="/#pricing" className="block px-4 py-2.5 rounded-xl hover:bg-orange-50 text-sm font-medium text-whoosh-dark" onClick={() => setMenuOpen(false)}>
-              Pricing
+            <Link href="/#pricing" className="flex items-center px-4 py-3 rounded-xl hover:bg-orange-50 text-sm font-medium text-[#1E293B] transition-colors" onClick={() => setMenuOpen(false)}>
+              {T.pricing}
             </Link>
-            <Link href="/dashboard" className="block px-4 py-2.5 rounded-xl hover:bg-purple-50 text-sm font-semibold text-whoosh-purple" onClick={() => setMenuOpen(false)}>
-              Shop Owner Login
+            <Link href="/dashboard" className="flex items-center px-4 py-3 rounded-xl hover:bg-purple-50 text-sm font-bold text-[#6B46C1] transition-colors" onClick={() => setMenuOpen(false)}>
+              {T.shopOwnerLogin}
             </Link>
-            <Link href="/shops" className="block px-4 py-2.5 rounded-xl bg-whoosh-orange text-white text-sm font-semibold text-center mt-2" onClick={() => setMenuOpen(false)}>
-              Order Now — Free Delivery
+            <Link href="/shops" className="flex items-center justify-center px-4 py-3 rounded-xl bg-[#FF8C42] text-white text-sm font-bold mt-1 shadow-orange transition-all active:scale-95" onClick={() => setMenuOpen(false)}>
+              {T.orderNow} — {T.freeDelivery}
             </Link>
           </div>
         )}

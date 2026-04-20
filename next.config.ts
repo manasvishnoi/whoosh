@@ -26,13 +26,6 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Cache static assets aggressively
-        source: "/_next/static/(.*)",
-        headers: [
-          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-        ],
-      },
-      {
         // Cache API responses lightly (shops list can be cached 60s)
         source: "/api/shops/(.*)",
         headers: [

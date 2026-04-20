@@ -6,9 +6,11 @@ import {
   Zap, BarChart3, Package, Users, MessageCircle, TrendingUp,
   ShoppingBag, Star, Bell, Settings, LogOut, ChevronRight,
   ArrowUp, ArrowDown, Bot, Send, Plus, CheckCircle2,
-  Clock, Truck, IndianRupee, RefreshCw, Eye, Edit3,
+  Clock, Truck, IndianRupee, RefreshCw, Edit3,
   Store, LayoutDashboard, Receipt,
 } from "lucide-react";
+import { useLang } from "@/context/LanguageContext";
+import { useToast } from "@/components/Toast";
 
 const SHOP = {
   name: "Rajesh General Store",
@@ -68,6 +70,8 @@ export default function DashboardPage() {
   const [muneemChat, setMuneemChat] = useState([
     { role: "muneem", text: "Namaskar Rajesh bhai sahab! 🙏 Aaj ki updates: 23 orders, ₹2,840 revenue. Ek suggestion hai — Pepsi 2L out of stock hai, restocking karein?" },
   ]);
+  const { T } = useLang();
+  const { showToast } = useToast();
 
   function sendMuneemMessage() {
     if (!muneemInput.trim()) return;
@@ -153,9 +157,9 @@ export default function DashboardPage() {
             <p className="text-xs text-whoosh-muted">Monday, 21 April 2025</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors">
-              <Bell className="w-5 h-5 text-whoosh-muted" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-whoosh-orange" />
+            <button onClick={() => showToast("3 new orders • 1 low stock alert • 1 udhaar due", "info")} className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors active:scale-90">
+              <Bell className="w-5 h-5 text-[#64748B]" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#FF8C42] animate-pulse" />
             </button>
             <img src={SHOP.logo} alt="avatar" className="w-8 h-8 rounded-xl" />
           </div>
@@ -275,8 +279,8 @@ export default function DashboardPage() {
                           {item.stock === 0 ? "Out of stock" : `${item.stock} ${item.unit} left`}
                         </p>
                       </div>
-                      <button className="shrink-0 px-3 py-1.5 rounded-lg bg-whoosh-dark text-white text-xs font-semibold hover:bg-gray-800 transition-colors">
-                        Reorder
+                      <button onClick={() => showToast("Reorder draft sent to distributor ✅", "success")} className="shrink-0 px-3 py-1.5 rounded-lg bg-[#0F172A] text-white text-xs font-semibold hover:bg-gray-800 transition-colors active:scale-95">
+                        {T.reorder}
                       </button>
                     </div>
                   ))}
@@ -290,8 +294,8 @@ export default function DashboardPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-whoosh-muted"><span className="font-bold text-whoosh-dark">{ORDERS.length}</span> orders today</p>
-                <button className="flex items-center gap-1.5 text-xs font-semibold text-whoosh-orange">
-                  <RefreshCw className="w-3.5 h-3.5" /> Refresh
+                <button onClick={() => showToast("Orders refreshed ✅", "info")} className="flex items-center gap-1.5 text-xs font-semibold text-[#FF8C42] hover:text-orange-600 transition-colors active:scale-95">
+                  <RefreshCw className="w-3.5 h-3.5" /> {T.refresh}
                 </button>
               </div>
               <div className="bg-white rounded-2xl shadow-card border border-gray-50 overflow-hidden">
@@ -328,8 +332,8 @@ export default function DashboardPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-whoosh-muted">18 products · <span className="text-red-500 font-semibold">4 low stock</span></p>
-                <button className="flex items-center gap-1.5 bg-whoosh-orange text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-orange-500 transition-colors">
-                  <Plus className="w-3.5 h-3.5" /> Add Product
+                <button onClick={() => showToast("Send a photo to Muneem on WhatsApp — it will create the listing automatically! 📸", "info")} className="flex items-center gap-1.5 bg-[#FF8C42] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-orange hover:brightness-105 transition-all active:scale-95">
+                  <Plus className="w-3.5 h-3.5" /> {T.addProduct}
                 </button>
               </div>
               <div className="bg-white rounded-2xl shadow-card border border-gray-50 overflow-hidden">
@@ -360,8 +364,8 @@ export default function DashboardPage() {
                       </span>
                     </div>
                     <div className="col-span-1 flex justify-end">
-                      <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-                        <Edit3 className="w-3.5 h-3.5 text-whoosh-muted" />
+                      <button onClick={() => showToast("Edit product — coming soon! Use Muneem on WhatsApp for now.", "info")} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors active:scale-90">
+                        <Edit3 className="w-3.5 h-3.5 text-[#64748B]" />
                       </button>
                     </div>
                   </div>
@@ -408,7 +412,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="text-right">
                       <p className="font-black text-red-600 text-base">₹{u.amount}</p>
-                      <button className="text-xs font-semibold text-whoosh-orange hover:underline">Send reminder</button>
+                      <button onClick={() => showToast("Polite reminder sent via WhatsApp ✅", "success")} className="text-xs font-semibold text-[#FF8C42] hover:text-orange-600 transition-colors active:scale-95">{T.sendReminder}</button>
                     </div>
                   </div>
                 ))}

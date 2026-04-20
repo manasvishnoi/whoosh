@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SahayakWidget from "@/components/SahayakWidget";
+import Providers from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "Whoosh — और वो आ गया!",
-  description:
-    "India's hyperlocal agentic commerce platform. Free delivery, every time. Your neighbourhood kirana, digitally empowered.",
+  description: "India's hyperlocal agentic commerce platform. Free delivery, every time. Your neighbourhood kirana, digitally empowered.",
   keywords: "kirana, hyperlocal, free delivery, WhatsApp commerce, India, Lucknow",
   openGraph: {
     title: "Whoosh — और वो आ गया!",
@@ -14,9 +14,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="hi-IN">
       <head>
@@ -28,8 +26,10 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        {children}
-        <SahayakWidget />
+        <Providers>
+          {children}
+          <SahayakWidget />
+        </Providers>
       </body>
     </html>
   );

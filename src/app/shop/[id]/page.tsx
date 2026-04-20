@@ -13,6 +13,8 @@ import ProductCard from "@/components/ProductCard";
 import Cart, { CartItem } from "@/components/Cart";
 import { getShopById, getProductsByShop, getProductCategories } from "@/lib/data";
 import type { Product } from "@/lib/data";
+import { useLang } from "@/context/LanguageContext";
+import { useToast } from "@/components/Toast";
 
 export default function ShopPage() {
   const { id } = useParams<{ id: string }>();
@@ -26,6 +28,8 @@ export default function ShopPage() {
   const [search, setSearch] = useState("");
   const [liked, setLiked] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const { T } = useLang();
+  const { showToast } = useToast();
 
   const cartTotal = cart.reduce((s, i) => s + i.quantity, 0);
   const cartValue = cart.reduce((s, i) => s + i.product.price * i.quantity, 0);
@@ -34,6 +38,7 @@ export default function ShopPage() {
     setCart((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) return prev.map((i) => i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);
+      showToast(`${product.name} added!`, "cart");
       return [...prev, { product, quantity: 1 }];
     });
   }
@@ -109,13 +114,16 @@ export default function ShopPage() {
           </Link>
           <div className="flex gap-2">
             <button
-              onClick={() => setLiked(!liked)}
-              className="w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-colors"
+              onClick={() => { setLiked(!liked); showToast(liked ? "Removed from favourites" : "Added to favourites ❤️", liked ? "info" : "success"); }}
+              className="w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-all active:scale-90"
             >
-              <Heart className={`w-4.5 h-4.5 ${liked ? "text-red-500 fill-red-500" : "text-whoosh-dark"}`} />
+              <Heart className={`w-4 h-4 transition-colors ${liked ? "text-red-500 fill-red-500" : "text-[#1E293B]"}`} />
             </button>
-            <button className="w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-colors">
-              <Share2 className="w-4 h-4 text-whoosh-dark" />
+            <button
+              onClick={() => { if (navigator.share) { navigator.share({ title: shop.name, url: window.location.href }); } else { navigator.clipboard.writeText(window.location.href); showToast("Link copied!", "success"); } }}
+              className="w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-all active:scale-90"
+            >
+              <Share2 className="w-4 h-4 text-[#1E293B]" />
             </button>
           </div>
         </div>
@@ -347,6 +355,7 @@ export default function ShopPage() {
         <Cart
           items={cart}
           shopName={shop.name}
+          whatsapp={shop.whatsapp}
           onAdd={addToCart}
           onRemove={removeFromCart}
           onClose={() => setShowCart(false)}
