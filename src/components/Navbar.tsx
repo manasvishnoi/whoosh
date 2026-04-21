@@ -88,6 +88,13 @@ export default function Navbar({ cartCount = 0, variant = "landing" }: NavbarPro
             {variant === "landing" && (
               <div className="hidden sm:flex items-center gap-2">
                 <Link
+                  href="/sahayak"
+                  className="text-sm font-semibold text-[#FF8C42] hover:text-orange-600 px-3 py-2 rounded-xl hover:bg-orange-50 transition-all duration-150 flex items-center gap-1.5"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                  {T.chatWithSahayak}
+                </Link>
+                <Link
                   href="/dashboard"
                   className="text-sm font-semibold text-[#6B46C1] hover:text-purple-800 px-3 py-2 rounded-xl hover:bg-purple-50 transition-all duration-150"
                 >
