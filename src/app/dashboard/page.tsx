@@ -14,7 +14,6 @@ import { useToast } from "@/components/Toast";
 
 const SHOP = {
   name: "Rajesh General Store",
-  hindi: "राजेश जनरल स्टोर",
   owner: "Rajesh Gupta",
   area: "Aminabad, Lucknow",
   plan: "Pro",
@@ -23,11 +22,11 @@ const SHOP = {
   reviews: 248,
 };
 
-const STATS_DATA = [
-  { label: "Today's Revenue", hindi: "आज की कमाई", value: "₹2,840", delta: "+18%", deltaUp: true, icon: IndianRupee, color: "orange" },
-  { label: "Orders Today", hindi: "आज के ऑर्डर", value: "23", delta: "+5", deltaUp: true, icon: ShoppingBag, color: "purple" },
-  { label: "Active Customers", hindi: "सक्रिय ग्राहक", value: "142", delta: "+12", deltaUp: true, icon: Users, color: "blue" },
-  { label: "Pending Deliveries", hindi: "बाकी डिलीवरी", value: "4", delta: "-2", deltaUp: false, icon: Truck, color: "green" },
+const STATS_DATA_BASE = [
+  { key: "todayRevenue",       value: "₹2,840", delta: "+18%", deltaUp: true,  icon: IndianRupee, color: "orange" },
+  { key: "ordaysOrders",       value: "23",      delta: "+5",   deltaUp: true,  icon: ShoppingBag, color: "purple" },
+  { key: "activeCustomers",    value: "142",     delta: "+12",  deltaUp: true,  icon: Users,       color: "blue" },
+  { key: "pendingDeliveries",  value: "4",       delta: "-2",   deltaUp: false, icon: Truck,       color: "green" },
 ];
 
 const ORDERS = [
@@ -72,6 +71,7 @@ export default function DashboardPage() {
   ]);
   const { T } = useLang();
   const { showToast } = useToast();
+  const STATS_DATA = STATS_DATA_BASE.map((s) => ({ ...s, label: T[s.key as keyof typeof T] as string }));
 
   function sendMuneemMessage() {
     if (!muneemInput.trim()) return;
@@ -115,11 +115,11 @@ export default function DashboardPage() {
         {/* Nav */}
         <nav className="flex-1 p-3 space-y-0.5">
           {[
-            { id: "overview", label: "Overview", hindi: "सारांश", icon: LayoutDashboard },
-            { id: "orders", label: "Orders", hindi: "ऑर्डर", icon: ShoppingBag },
-            { id: "inventory", label: "Inventory", hindi: "स्टॉक", icon: Package },
-            { id: "customers", label: "Customers", hindi: "ग्राहक", icon: Users },
-            { id: "muneem", label: "Muneem AI", hindi: "मुनीम", icon: Bot },
+            { id: "overview",  label: T.overview,    icon: LayoutDashboard },
+            { id: "orders",    label: T.orders,      icon: ShoppingBag },
+            { id: "inventory", label: T.inventory,   icon: Package },
+            { id: "customers", label: T.customers,   icon: Users },
+            { id: "muneem",    label: T.muneemAITab, icon: Bot },
           ].map((item) => (
             <button
               key={item.id}
@@ -127,10 +127,7 @@ export default function DashboardPage() {
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === item.id ? "bg-orange-50 text-whoosh-orange font-semibold" : "text-whoosh-muted hover:bg-gray-50 hover:text-whoosh-dark"}`}
             >
               <item.icon className="w-4 h-4 shrink-0" />
-              <div className="text-left">
-                <p className="leading-tight">{item.label}</p>
-                <p className="text-[10px] opacity-60 hindi">{item.hindi}</p>
-              </div>
+              <span className="leading-tight">{item.label}</span>
             </button>
           ))}
         </nav>
@@ -138,10 +135,10 @@ export default function DashboardPage() {
         {/* Bottom */}
         <div className="p-3 border-t border-gray-100 space-y-0.5">
           <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-whoosh-muted hover:bg-gray-50 hover:text-whoosh-dark transition-all">
-            <Settings className="w-4 h-4" /> Settings
+            <Settings className="w-4 h-4" /> {T.settings}
           </button>
           <Link href="/" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-whoosh-muted hover:bg-gray-50 hover:text-whoosh-dark transition-all">
-            <LogOut className="w-4 h-4" /> Exit Dashboard
+            <LogOut className="w-4 h-4" /> {T.exitDashboard}
           </Link>
         </div>
       </aside>
@@ -152,7 +149,7 @@ export default function DashboardPage() {
         <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
           <div>
             <h1 className="text-lg font-black text-whoosh-dark capitalize">
-              {activeTab === "muneem" ? "Muneem AI Agent" : activeTab}
+              {activeTab === "muneem" ? T.muneemAITab : T[activeTab as keyof typeof T] as string}
             </h1>
             <p className="text-xs text-whoosh-muted">Monday, 21 April 2025</p>
           </div>
@@ -398,8 +395,7 @@ export default function DashboardPage() {
               {/* Udhaar ledger */}
               <div className="bg-white rounded-2xl shadow-card border border-gray-50 overflow-hidden">
                 <div className="px-5 py-4 border-b border-gray-100">
-                  <h3 className="font-bold text-whoosh-dark">Udhaar Ledger</h3>
-                  <p className="text-xs text-whoosh-muted hindi">उधार खाता</p>
+                  <h3 className="font-bold text-whoosh-dark">{T.udhaarLedger}</h3>
                 </div>
                 {UDHAAR.map((u) => (
                   <div key={u.name} className="px-5 py-4 flex items-center gap-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
@@ -431,7 +427,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="font-bold text-white">Muneem</p>
-                    <p className="text-xs text-purple-200">मुनीम — Your AI Shop Agent • Online</p>
+                    <p className="text-xs text-purple-200">{T.muneemAITab} — {T.muneemShopAgent} • Online</p>
                   </div>
                   <div className="ml-auto flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
