@@ -197,7 +197,6 @@ export default function DashboardPage() {
                     </div>
                     <p className="text-2xl font-black text-whoosh-dark">{stat.value}</p>
                     <p className="text-xs text-whoosh-muted mt-0.5">{stat.label}</p>
-                    <p className="text-[10px] text-whoosh-muted hindi opacity-70">{stat.hindi}</p>
                   </div>
                 ))}
               </div>
