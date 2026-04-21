@@ -2,11 +2,16 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Bot, X, Send, Zap, Mic, RotateCcw, ChevronDown } from "lucide-react";
+import { renderMarkdown } from "@/lib/renderMarkdown";
+import { useToast } from "@/components/Toast";
+import SahayakOrderCard, { parseOrderDirective, resolveOrder, type ResolvedOrder } from "@/components/SahayakOrderCard";
 
 type Message = {
   role: "user" | "assistant";
   content: string;
   loading?: boolean;
+  order?: ResolvedOrder;
+  orderStatus?: "pending" | "placed" | "cancelled";
 };
 
 const QUICK_PROMPTS_EN = [
@@ -31,6 +36,7 @@ const WELCOME_MSG: Message = {
 };
 
 export default function SahayakWidget() {
+  const { showToast } = useToast();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([WELCOME_MSG]);
   const [input, setInput] = useState("");
@@ -101,17 +107,23 @@ export default function SahayakWidget() {
             try {
               const { text } = JSON.parse(data);
               fullText += text;
+              const orderStart = fullText.indexOf("<ORDER");
+              const displayText = orderStart >= 0 ? fullText.slice(0, orderStart).trim() : fullText;
               setMessages((prev) =>
-                prev.map((m, i) => i === prev.length - 1 ? { ...m, content: fullText + "▌" } : m)
+                prev.map((m, i) => i === prev.length - 1 ? { ...m, content: displayText + "▌" } : m)
               );
             } catch {}
           }
         }
       }
 
-      // remove cursor
+      const { clean, draft } = parseOrderDirective(fullText);
+      const resolved = draft ? resolveOrder(draft) : null;
       setMessages((prev) =>
-        prev.map((m, i) => i === prev.length - 1 ? { ...m, content: fullText } : m)
+        prev.map((m, i) => i === prev.length - 1
+          ? { ...m, content: clean || fullText, order: resolved ?? undefined, orderStatus: resolved ? "pending" : undefined }
+          : m
+        )
       );
 
       if (!open) setUnread((u) => u + 1);
@@ -131,6 +143,16 @@ export default function SahayakWidget() {
   function resetChat() {
     setMessages([WELCOME_MSG]);
     setInput("");
+  }
+
+  function confirmOrder(index: number) {
+    setMessages((prev) => prev.map((m, i) => i === index ? { ...m, orderStatus: "placed" } : m));
+    const total = messages[index]?.order?.total ?? 0;
+    showToast(lang === "hi" ? `ऑर्डर कन्फर्म ✅ ₹${total}` : `Order placed ✅ ₹${total}`, "success");
+  }
+
+  function cancelOrder(index: number) {
+    setMessages((prev) => prev.map((m, i) => i === index ? { ...m, orderStatus: "cancelled" } : m));
   }
 
   const quickPrompts = lang === "hi" ? QUICK_PROMPTS_HI : QUICK_PROMPTS_EN;
@@ -200,20 +222,32 @@ export default function SahayakWidget() {
                     <Zap className="w-3.5 h-3.5 text-white fill-white" />
                   </div>
                 )}
-                <div
-                  className={`max-w-[82%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                    msg.role === "user"
-                      ? "bg-whoosh-orange text-white rounded-tr-sm"
-                      : "bg-white text-whoosh-dark shadow-sm border border-gray-100 rounded-tl-sm"
-                  } ${msg.loading ? "animate-pulse2" : ""}`}
-                >
-                  {msg.loading ? (
-                    <div className="flex gap-1 items-center py-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-orange-300 animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-bounce" style={{ animationDelay: "300ms" }} />
+                <div className="max-w-[82%] flex flex-col gap-1.5">
+                  {(msg.loading || msg.content) && (
+                    <div
+                      className={`px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                        msg.role === "user"
+                          ? "bg-whoosh-orange text-white rounded-tr-sm"
+                          : "bg-white text-whoosh-dark shadow-sm border border-gray-100 rounded-tl-sm"
+                      } ${msg.loading ? "animate-pulse2" : ""}`}
+                    >
+                      {msg.loading ? (
+                        <div className="flex gap-1 items-center py-0.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-orange-300 animate-bounce" style={{ animationDelay: "0ms" }} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-bounce" style={{ animationDelay: "300ms" }} />
+                        </div>
+                      ) : msg.role === "user" ? msg.content : renderMarkdown(msg.content)}
                     </div>
-                  ) : msg.content}
+                  )}
+                  {msg.order && msg.orderStatus && (
+                    <SahayakOrderCard
+                      order={msg.order}
+                      status={msg.orderStatus}
+                      onConfirm={() => confirmOrder(i)}
+                      onCancel={() => cancelOrder(i)}
+                    />
+                  )}
                 </div>
               </div>
             ))}

@@ -7,11 +7,16 @@ import {
   ShoppingCart, Pill, Store, Clock, Star, MessageCircle,
 } from "lucide-react";
 import { useLang } from "@/context/LanguageContext";
+import { renderMarkdown } from "@/lib/renderMarkdown";
+import { useToast } from "@/components/Toast";
+import SahayakOrderCard, { parseOrderDirective, resolveOrder, type ResolvedOrder } from "@/components/SahayakOrderCard";
 
 type Message = {
   role: "user" | "assistant";
   content: string;
   loading?: boolean;
+  order?: ResolvedOrder;
+  orderStatus?: "pending" | "placed" | "cancelled";
 };
 
 const WELCOME_EN = `Namaste! 🙏 I'm **Sahayak** — your personal AI shopping assistant from Whoosh.
@@ -56,6 +61,7 @@ const QUICK_PROMPTS_HI = [
 
 export default function SahayakPage() {
   const { lang, toggleLang } = useLang();
+  const { showToast } = useToast();
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: lang === "hi" ? WELCOME_HI : WELCOME_EN },
   ]);
@@ -110,13 +116,20 @@ export default function SahayakPage() {
             try {
               const { text } = JSON.parse(data);
               fullText += text;
-              setMessages((prev) => prev.map((m, i) => i === prev.length - 1 ? { ...m, content: fullText + "▌" } : m));
+              const orderStart = fullText.indexOf("<ORDER");
+              const displayText = orderStart >= 0 ? fullText.slice(0, orderStart).trim() : fullText;
+              setMessages((prev) => prev.map((m, i) => i === prev.length - 1 ? { ...m, content: displayText + "▌" } : m));
             } catch {}
           }
         }
       }
 
-      setMessages((prev) => prev.map((m, i) => i === prev.length - 1 ? { ...m, content: fullText } : m));
+      const { clean, draft } = parseOrderDirective(fullText);
+      const resolved = draft ? resolveOrder(draft) : null;
+      setMessages((prev) => prev.map((m, i) => i === prev.length - 1
+        ? { ...m, content: clean || fullText, order: resolved ?? undefined, orderStatus: resolved ? "pending" : undefined }
+        : m
+      ));
     } catch {
       setMessages((prev) => prev.map((m, i) =>
         i === prev.length - 1
@@ -132,6 +145,17 @@ export default function SahayakPage() {
   function resetChat() {
     setMessages([{ role: "assistant", content: lang === "hi" ? WELCOME_HI : WELCOME_EN }]);
     setInput("");
+  }
+
+  function confirmOrder(index: number) {
+    setMessages((prev) => prev.map((m, i) => i === index ? { ...m, orderStatus: "placed" } : m));
+    const msg = messages[index];
+    const total = msg?.order?.total ?? 0;
+    showToast(lang === "hi" ? `ऑर्डर कन्फर्म ✅ ₹${total}` : `Order placed ✅ ₹${total}`, "success");
+  }
+
+  function cancelOrder(index: number) {
+    setMessages((prev) => prev.map((m, i) => i === index ? { ...m, orderStatus: "cancelled" } : m));
   }
 
   const quickPrompts = lang === "hi" ? QUICK_PROMPTS_HI : QUICK_PROMPTS_EN;
@@ -213,19 +237,31 @@ export default function SahayakPage() {
                 <Zap className="w-4 h-4 text-white fill-white" />
               </div>
             )}
-            <div className={`max-w-[80%] sm:max-w-[70%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${
-              msg.role === "user"
-                ? "bg-[#FF8C42] text-white rounded-tr-sm"
-                : "bg-white text-[#1E293B] border border-gray-100 rounded-tl-sm"
-            }`}>
-              {msg.loading ? (
-                <div className="flex gap-1.5 items-center py-1">
-                  {[0, 150, 300].map((delay) => (
-                    <span key={delay} className="w-2 h-2 rounded-full bg-orange-300 animate-bounce"
-                      style={{ animationDelay: `${delay}ms` }} />
-                  ))}
+            <div className="max-w-[80%] sm:max-w-[70%] flex flex-col gap-0">
+              {(msg.loading || msg.content) && (
+                <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${
+                  msg.role === "user"
+                    ? "bg-[#FF8C42] text-white rounded-tr-sm"
+                    : "bg-white text-[#1E293B] border border-gray-100 rounded-tl-sm"
+                }`}>
+                  {msg.loading ? (
+                    <div className="flex gap-1.5 items-center py-1">
+                      {[0, 150, 300].map((delay) => (
+                        <span key={delay} className="w-2 h-2 rounded-full bg-orange-300 animate-bounce"
+                          style={{ animationDelay: `${delay}ms` }} />
+                      ))}
+                    </div>
+                  ) : msg.role === "user" ? msg.content : renderMarkdown(msg.content)}
                 </div>
-              ) : msg.content}
+              )}
+              {msg.order && msg.orderStatus && (
+                <SahayakOrderCard
+                  order={msg.order}
+                  status={msg.orderStatus}
+                  onConfirm={() => confirmOrder(i)}
+                  onCancel={() => cancelOrder(i)}
+                />
+              )}
             </div>
             {msg.role === "user" && (
               <div className="w-8 h-8 rounded-xl bg-[#6B46C1] flex items-center justify-center shrink-0 mt-1 text-white text-xs font-bold shadow-sm">
