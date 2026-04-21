@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { Star, Clock, MapPin, Zap, MessageCircle, ArrowRight } from "lucide-react";
 import type { Shop } from "@/lib/data";
+import { useLang } from "@/context/LanguageContext";
 
 interface ShopCardProps {
   shop: Shop;
@@ -13,6 +16,7 @@ const PLAN_STYLES: Record<"starter" | "pro" | "elite", { label: string; bg: stri
 };
 
 export default function ShopCard({ shop }: ShopCardProps) {
+  const { T } = useLang();
   const plan = PLAN_STYLES[shop.plan];
 
   return (
@@ -32,7 +36,7 @@ export default function ShopCard({ shop }: ShopCardProps) {
           {/* Status */}
           <div className={`absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-sm
             ${shop.isOpen ? "bg-emerald-500/90 text-white" : "bg-black/60 text-gray-300"}`}>
-            {shop.isOpen ? "● Open" : "Closed"}
+            {shop.isOpen ? `● ${T.open}` : T.closed}
           </div>
 
           {/* Plan */}

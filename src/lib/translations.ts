@@ -236,6 +236,7 @@ export const t = {
     starter: "Starter",
     rating: "reviews",
     minOrder: "Min. order",
+    orderConfirmed: "Order confirmed!",
   },
 
   hi: {
@@ -473,6 +474,7 @@ export const t = {
     starter: "शुरुआती",
     rating: "समीक्षाएं",
     minOrder: "न्यूनतम ऑर्डर",
+    orderConfirmed: "ऑर्डर कन्फर्म!",
   },
 } as const;
 

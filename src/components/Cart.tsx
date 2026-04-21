@@ -25,10 +25,7 @@ export default function Cart({ items, shopName, whatsapp, onAdd, onRemove, onClo
   const savings = items.reduce((s, i) => s + (i.product.mrp - i.product.price) * i.quantity, 0);
 
   function handlePlaceOrder() {
-    showToast(
-      T.placeOrder + " ✅ " + (T.yourCart === "Your Cart" ? "Order confirmed!" : "ऑर्डर कन्फर्म!"),
-      "success"
-    );
+    showToast(`${T.placeOrder} ✅ ${T.orderConfirmed}`, "success");
     onClose();
   }
 
