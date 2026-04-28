@@ -1,6 +1,6 @@
 "use client";
 
-import { ShoppingCart, Zap, Check, X, MapPin, Clock } from "lucide-react";
+import { ShoppingBag, Bike, Check, X, MapPin, Clock, Sparkles } from "lucide-react";
 import { SHOPS, getProductsByShop } from "@/lib/data";
 import { useLang } from "@/context/LanguageContext";
 
@@ -45,16 +45,7 @@ export function resolveOrder(draft: OrderDraft): ResolvedOrder | null {
   const total = lines.reduce((s, l) => s + l.subtotal, 0);
   const savings = lines.reduce((s, l) => s + (l.mrp - l.price) * l.quantity, 0);
 
-  return {
-    shopId: shop.id,
-    shopName: shop.name,
-    shopArea: shop.area,
-    whatsapp: shop.whatsapp,
-    lines,
-    total,
-    savings,
-    missingIds,
-  };
+  return { shopId: shop.id, shopName: shop.name, shopArea: shop.area, whatsapp: shop.whatsapp, lines, total, savings, missingIds };
 }
 
 interface Props {
@@ -74,33 +65,33 @@ export default function SahayakOrderCard({ order, status, onConfirm, onCancel }:
       ? (isHi ? "ऑर्डर रद्द" : "Order cancelled")
       : (isHi ? "ऑर्डर कन्फर्म करें" : "Confirm your order");
 
+  const headerStyles = {
+    placed:    { bg: "bg-whoosh-green-light", text: "text-whoosh-green-dark", border: "border-whoosh-green/30" },
+    cancelled: { bg: "bg-slate-50",            text: "text-slate-500",         border: "border-slate-200" },
+    pending:   { bg: "bg-whoosh-purple-light", text: "text-whoosh-purple",     border: "border-whoosh-purple/25" },
+  } as const;
+
+  const s = headerStyles[status];
+
   return (
-    <div className={`mt-2 rounded-2xl border bg-white shadow-sm overflow-hidden ${
-      status === "placed" ? "border-emerald-200" : status === "cancelled" ? "border-gray-200 opacity-75" : "border-orange-200"
-    }`}>
-      <div className={`px-4 py-2.5 flex items-center gap-2 ${
-        status === "placed" ? "bg-emerald-50" : status === "cancelled" ? "bg-gray-50" : "bg-orange-50"
-      }`}>
+    <div className={`mt-2 rounded-2xl border bg-white shadow-soft overflow-hidden ${s.border} ${status === "cancelled" ? "opacity-75" : ""}`}>
+      <div className={`px-4 py-2.5 flex items-center gap-2 ${s.bg}`}>
         {status === "placed" ? (
-          <Check className="w-4 h-4 text-emerald-600" />
+          <Check className="w-4 h-4 text-whoosh-green-dark" />
         ) : status === "cancelled" ? (
-          <X className="w-4 h-4 text-gray-500" />
+          <X className="w-4 h-4 text-slate-500" />
         ) : (
-          <ShoppingCart className="w-4 h-4 text-[#FF8C42]" />
+          <Sparkles className="w-4 h-4 text-whoosh-purple" />
         )}
-        <p className={`text-xs font-black ${
-          status === "placed" ? "text-emerald-700" : status === "cancelled" ? "text-gray-500" : "text-[#E87030]"
-        }`}>
-          {header}
-        </p>
+        <p className={`text-xs font-extrabold tracking-tight ${s.text}`}>{header}</p>
       </div>
 
       <div className="p-4">
-        <div className="flex items-center gap-1.5 text-xs text-[#64748B] mb-2.5">
-          <span className="font-bold text-[#1E293B]">{order.shopName}</span>
+        <div className="flex items-center gap-1.5 text-xs text-whoosh-muted mb-3">
+          <span className="font-extrabold text-whoosh-dark">{order.shopName}</span>
           <span className="flex items-center gap-0.5"><MapPin className="w-3 h-3" />{order.shopArea}</span>
-          <span className="flex items-center gap-0.5 ml-auto font-bold text-emerald-600">
-            <Zap className="w-3 h-3 fill-emerald-500 text-emerald-500" />Free
+          <span className="flex items-center gap-0.5 ml-auto chip chip-mint !py-0.5">
+            <Bike className="w-3 h-3" />Free
           </span>
         </div>
 
@@ -108,28 +99,28 @@ export default function SahayakOrderCard({ order, status, onConfirm, onCancel }:
           {order.lines.map((l, i) => (
             <div key={i} className="flex items-start justify-between text-sm gap-2">
               <div className="flex-1 min-w-0">
-                <p className="text-[#1E293B] font-medium leading-tight truncate">{l.name}</p>
-                <p className="text-[11px] text-[#94A3B8]">{l.unit} × {l.quantity}</p>
+                <p className="text-whoosh-dark font-semibold leading-tight truncate">{l.name}</p>
+                <p className="text-[11px] text-slate-400">{l.unit} × {l.quantity}</p>
               </div>
-              <span className="font-bold text-[#1E293B] shrink-0">₹{l.subtotal}</span>
+              <span className="font-extrabold text-whoosh-dark shrink-0">₹{l.subtotal}</span>
             </div>
           ))}
         </div>
 
-        <div className="border-t border-gray-100 pt-2.5 space-y-1 mb-3">
+        <div className="border-t border-slate-100 pt-2.5 space-y-1 mb-3">
           {order.savings > 0 && (
             <div className="flex justify-between text-xs">
-              <span className="text-[#64748B]">{isHi ? "आप बचाएँगे" : "You save"}</span>
-              <span className="font-bold text-emerald-600">₹{order.savings}</span>
+              <span className="text-whoosh-muted">{isHi ? "आप बचाएँगे" : "You save"}</span>
+              <span className="font-bold text-whoosh-orange-dark">₹{order.savings}</span>
             </div>
           )}
           <div className="flex justify-between text-xs">
-            <span className="text-[#64748B] flex items-center gap-1"><Clock className="w-3 h-3" />{isHi ? "डिलीवरी" : "Delivery"}</span>
-            <span className="font-black text-emerald-600">FREE</span>
+            <span className="text-whoosh-muted flex items-center gap-1"><Clock className="w-3 h-3" />{isHi ? "डिलीवरी" : "Delivery"}</span>
+            <span className="font-extrabold text-whoosh-green-dark">FREE</span>
           </div>
-          <div className="flex justify-between items-center pt-1 border-t border-gray-50">
-            <span className="text-sm font-black text-[#1E293B]">{isHi ? "कुल" : "Total"}</span>
-            <span className="text-base font-black text-[#1E293B]">₹{order.total}</span>
+          <div className="flex justify-between items-center pt-1.5 border-t border-slate-100">
+            <span className="text-sm font-extrabold text-whoosh-dark">{isHi ? "कुल" : "Total"}</span>
+            <span className="text-base font-extrabold text-whoosh-dark">₹{order.total}</span>
           </div>
         </div>
 
@@ -137,13 +128,13 @@ export default function SahayakOrderCard({ order, status, onConfirm, onCancel }:
           <div className="flex gap-2">
             <button
               onClick={onCancel}
-              className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-[#64748B] hover:bg-gray-50 transition-colors active:scale-95"
+              className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-500 hover:bg-slate-50 transition-colors active:scale-95"
             >
               {isHi ? "रद्द करें" : "Cancel"}
             </button>
             <button
               onClick={onConfirm}
-              className="flex-[2] py-2.5 rounded-xl bg-[#FF8C42] hover:brightness-105 text-white text-sm font-black transition-all shadow-orange active:scale-95 flex items-center justify-center gap-1.5"
+              className="flex-[2] btn-primary py-2.5 text-sm"
             >
               <Check className="w-4 h-4" />
               {isHi ? `कन्फर्म — ₹${order.total}` : `Confirm — ₹${order.total}`}
@@ -152,7 +143,7 @@ export default function SahayakOrderCard({ order, status, onConfirm, onCancel }:
         )}
 
         {status === "placed" && (
-          <p className="text-xs text-emerald-600 font-semibold text-center">
+          <p className="text-xs text-whoosh-green-dark font-semibold text-center">
             {isHi ? "जल्द ही डिलीवर होगा 🚀" : "Will be delivered soon 🚀"}
           </p>
         )}

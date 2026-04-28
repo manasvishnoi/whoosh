@@ -1,19 +1,13 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
-import { CheckCircle2, X, AlertCircle, Info, Zap } from "lucide-react";
+import { CheckCircle2, X, AlertCircle, Info, Sparkles } from "lucide-react";
 
 type ToastType = "success" | "error" | "info" | "cart";
 
-type Toast = {
-  id: number;
-  message: string;
-  type: ToastType;
-};
+type Toast = { id: number; message: string; type: ToastType };
 
-type ToastContextType = {
-  showToast: (message: string, type?: ToastType) => void;
-};
+type ToastContextType = { showToast: (message: string, type?: ToastType) => void };
 
 const ToastContext = createContext<ToastContextType>({ showToast: () => {} });
 
@@ -23,26 +17,23 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const showToast = useCallback((message: string, type: ToastType = "success") => {
     const id = Date.now();
     setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3000);
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
   }, []);
 
-  const removeToast = (id: number) =>
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+  const removeToast = (id: number) => setToasts((prev) => prev.filter((t) => t.id !== id));
 
-  const icons = {
-    success: <CheckCircle2 className="w-4 h-4 text-green-500" />,
-    error: <AlertCircle className="w-4 h-4 text-red-500" />,
-    info: <Info className="w-4 h-4 text-blue-500" />,
-    cart: <Zap className="w-4 h-4 text-whoosh-orange fill-whoosh-orange" />,
+  const icons: Record<ToastType, JSX.Element> = {
+    success: <CheckCircle2 className="w-4 h-4 text-whoosh-green-dark" />,
+    error:   <AlertCircle className="w-4 h-4 text-red-500" />,
+    info:    <Info className="w-4 h-4 text-whoosh-purple" />,
+    cart:    <Sparkles className="w-4 h-4 text-whoosh-purple" />,
   };
 
-  const styles = {
-    success: "border-green-200 bg-white",
-    error: "border-red-200 bg-white",
-    info: "border-blue-200 bg-white",
-    cart: "border-orange-200 bg-orange-50",
+  const styles: Record<ToastType, string> = {
+    success: "border-whoosh-green/30 bg-whoosh-green-light",
+    error:   "border-red-200 bg-red-50",
+    info:    "border-whoosh-purple/30 bg-whoosh-purple-light",
+    cart:    "border-whoosh-purple/30 bg-whoosh-purple-light",
   };
 
   return (
@@ -52,13 +43,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-lg text-sm font-medium text-whoosh-dark pointer-events-auto max-w-xs animate-fade-up ${styles[toast.type]}`}
+            className={`flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-card text-sm font-semibold text-whoosh-dark pointer-events-auto max-w-xs animate-fade-up ${styles[toast.type]}`}
           >
             {icons[toast.type]}
             <span>{toast.message}</span>
             <button
               onClick={() => removeToast(toast.id)}
-              className="ml-1 p-0.5 rounded-full hover:bg-gray-100 transition-colors"
+              className="ml-1 p-0.5 rounded-full hover:bg-white/60 transition-colors"
             >
               <X className="w-3 h-3 text-whoosh-muted" />
             </button>
@@ -69,6 +60,4 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useToast() {
-  return useContext(ToastContext);
-}
+export function useToast() { return useContext(ToastContext); }

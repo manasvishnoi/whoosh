@@ -4,9 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
-  Star, Clock, MapPin, Zap, MessageCircle, Share2, Heart,
+  Star, Clock, MapPin, Bike, MessageCircle, Share2, Heart,
   ChevronLeft, ShoppingCart, Search, X, Package, Info,
-  CheckCircle2, Bot, Phone,
+  CheckCircle2, Sparkles, Phone,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard";
@@ -87,98 +87,106 @@ export default function ShopPage() {
 
   if (!shop) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-cream">
         <div className="text-center">
-          <p className="text-xl font-bold text-whoosh-dark mb-4">Shop not found</p>
-          <Link href="/shops" className="text-whoosh-orange font-semibold hover:underline">← Back to shops</Link>
+          <div className="icon-tile icon-tile-purple mx-auto mb-4 w-14 h-14">
+            <Package className="w-6 h-6" />
+          </div>
+          <p className="text-xl font-extrabold tracking-tight text-whoosh-dark mb-4">Shop not found</p>
+          <Link href="/shops" className="btn-primary inline-flex items-center gap-2">
+            <ChevronLeft className="w-4 h-4" /> Back to shops
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream">
       <Navbar variant="shop" cartCount={cartTotal} />
 
       {/* Shop Header Banner */}
       <div className="relative">
-        <div className="h-52 bg-gray-200 overflow-hidden">
+        <div className="h-60 bg-whoosh-dark overflow-hidden">
           <img src={shop.banner} alt={shop.name} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-whoosh-dark/80 via-whoosh-dark/40 to-transparent" />
+          <div className="absolute inset-0 bg-mesh-purple opacity-30 mix-blend-overlay" />
         </div>
 
         {/* Back & actions */}
         <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-          <Link href="/shops" className="w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-colors">
+          <Link href="/shops" className="w-10 h-10 rounded-2xl glass flex items-center justify-center shadow-card hover:shadow-card-hover transition-all duration-200">
             <ChevronLeft className="w-5 h-5 text-whoosh-dark" />
           </Link>
           <div className="flex gap-2">
             <button
-              onClick={() => { setLiked(!liked); showToast(liked ? "Removed from favourites" : "Added to favourites ❤️", liked ? "info" : "success"); }}
-              className="w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-all active:scale-90"
+              onClick={() => { setLiked(!liked); showToast(liked ? "Removed from favourites" : "Added to favourites", liked ? "info" : "success"); }}
+              className="w-10 h-10 rounded-2xl glass flex items-center justify-center shadow-card hover:shadow-card-hover transition-all duration-200 active:scale-90"
             >
-              <Heart className={`w-4 h-4 transition-colors ${liked ? "text-red-500 fill-red-500" : "text-[#1E293B]"}`} />
+              <Heart className={`w-4 h-4 transition-colors ${liked ? "text-red-500 fill-red-500" : "text-whoosh-dark"}`} />
             </button>
             <button
               onClick={() => { if (navigator.share) { navigator.share({ title: shop.name, url: window.location.href }); } else { navigator.clipboard.writeText(window.location.href); showToast("Link copied!", "success"); } }}
-              className="w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-all active:scale-90"
+              className="w-10 h-10 rounded-2xl glass flex items-center justify-center shadow-card hover:shadow-card-hover transition-all duration-200 active:scale-90"
             >
-              <Share2 className="w-4 h-4 text-[#1E293B]" />
+              <Share2 className="w-4 h-4 text-whoosh-dark" />
             </button>
           </div>
         </div>
 
         {/* Shop logo & name overlay */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
-          <div className="flex items-end gap-3">
-            <img
-              src={shop.logo}
-              alt={shop.name}
-              className="w-16 h-16 rounded-2xl border-3 border-white shadow-lg object-cover bg-white shrink-0"
-            />
-            <div>
-              <h1 className="text-xl font-black text-white leading-tight">{shop.name}</h1>
-              <p className="text-white/80 text-xs hindi">{shop.hindiName}</p>
+        <div className="absolute bottom-0 left-0 right-0 px-4 pb-5">
+          <div className="max-w-6xl mx-auto flex items-end gap-3">
+            <div className="icon-tile icon-tile-solid-purple w-20 h-20 rounded-3xl shadow-purple shrink-0 p-1">
+              <img
+                src={shop.logo}
+                alt={shop.name}
+                className="w-full h-full rounded-2xl object-cover bg-white"
+              />
+            </div>
+            <div className="pb-1">
+              <h1 className="font-display text-2xl md:text-3xl font-extrabold tracking-tight text-white leading-tight">{shop.name}</h1>
+              <p className="text-white/85 text-sm hindi">{shop.hindiName}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Shop Info Bar */}
-      <div className="bg-white px-4 py-4 border-b border-gray-100 shadow-sm">
+      <div className="bg-white px-4 py-5 border-b border-slate-100 shadow-card">
         <div className="max-w-6xl mx-auto">
           {/* Rating + details row */}
-          <div className="flex flex-wrap items-center gap-4 mb-3">
-            <div className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-xl">
-              <Star className="w-4 h-4 text-green-600 fill-green-600" />
-              <span className="font-bold text-green-700 text-sm">{shop.rating}</span>
-              <span className="text-xs text-green-600">({shop.reviewCount} reviews)</span>
+          <div className="flex flex-wrap items-center gap-3 mb-3">
+            <div className="chip chip-mint">
+              <Star className="w-4 h-4 fill-current" />
+              <span className="font-extrabold text-sm">{shop.rating}</span>
+              <span className="text-xs opacity-80">({shop.reviewCount})</span>
             </div>
-            <div className="flex items-center gap-1 text-sm text-whoosh-muted">
+            <div className="chip">
               <Clock className="w-4 h-4" />
               <span>{shop.eta}</span>
             </div>
-            <div className="flex items-center gap-1 text-sm text-whoosh-muted">
+            <div className="chip">
               <MapPin className="w-4 h-4" />
               <span>{shop.distance}</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Zap className="w-4 h-4 text-whoosh-green fill-whoosh-green" />
-              <span className="text-sm font-bold text-whoosh-green">Free Delivery</span>
+            <div className="badge-pulse">
+              <Bike className="w-4 h-4" />
+              <span className="font-extrabold">FREE Delivery</span>
             </div>
-            <div className={`ml-auto flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${shop.isOpen ? "bg-green-50 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-              <div className={`w-1.5 h-1.5 rounded-full ${shop.isOpen ? "bg-green-500 animate-pulse" : "bg-gray-400"}`} />
+            <div className={`ml-auto chip ${shop.isOpen ? "chip-mint" : "chip-dark"}`}>
+              <div className={`w-1.5 h-1.5 rounded-full ${shop.isOpen ? "bg-whoosh-green animate-pulse" : "bg-slate-400"}`} />
               {shop.isOpen ? `Open · Closes ${shop.closeTime}` : `Closed · Opens ${shop.openTime}`}
             </div>
           </div>
 
           {/* Description */}
-          <p className="text-sm text-whoosh-muted mb-3">{shop.description}</p>
+          <p className="text-sm text-whoosh-muted mb-3 leading-relaxed">{shop.description}</p>
 
           {/* Features */}
           <div className="flex flex-wrap gap-2">
             {shop.features.map((f) => (
-              <span key={f} className="flex items-center gap-1 text-xs font-medium bg-orange-50 text-orange-700 px-2.5 py-1 rounded-full border border-orange-100">
+              <span key={f} className="chip chip-purple">
                 <CheckCircle2 className="w-3 h-3" /> {f}
               </span>
             ))}
@@ -186,13 +194,13 @@ export default function ShopPage() {
               href={`https://wa.me/${shop.whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs font-medium bg-green-50 text-green-700 px-2.5 py-1 rounded-full border border-green-100 hover:bg-green-100 transition-colors"
+              className="chip chip-mint hover:scale-105 transition-all duration-200"
             >
               <MessageCircle className="w-3 h-3" /> WhatsApp
             </a>
             <a
               href={`tel:${shop.phone}`}
-              className="flex items-center gap-1 text-xs font-medium bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full border border-blue-100 hover:bg-blue-100 transition-colors"
+              className="chip chip-orange hover:scale-105 transition-all duration-200"
             >
               <Phone className="w-3 h-3" /> Call
             </a>
@@ -204,10 +212,10 @@ export default function ShopPage() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="flex gap-6 relative">
           {/* Left: Category sidebar (sticky) */}
-          <aside className="hidden md:block w-48 shrink-0">
-            <div className="sticky top-32 bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
-              <div className="p-3 border-b border-gray-100">
-                <p className="text-xs font-bold text-whoosh-muted uppercase tracking-wide">Categories</p>
+          <aside className="hidden md:block w-52 shrink-0">
+            <div className="sticky top-32 card overflow-hidden p-0">
+              <div className="p-4 border-b border-slate-100">
+                <p className="text-[11px] font-extrabold text-whoosh-purple uppercase tracking-widest">Categories</p>
               </div>
               <nav className="p-2 space-y-0.5">
                 {categories.map((cat) => {
@@ -216,10 +224,10 @@ export default function ShopPage() {
                     <button
                       key={cat}
                       onClick={() => scrollToCategory(cat)}
-                      className={`category-nav-item w-full text-left flex items-center justify-between ${activeCategory === cat ? "active" : ""}`}
+                      className={`category-nav-item w-full text-left flex items-center justify-between transition-all duration-200 ${activeCategory === cat ? "active" : ""}`}
                     >
                       <span className="truncate">{cat}</span>
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 ml-1 ${activeCategory === cat ? "bg-orange-100 text-orange-600" : "bg-gray-100 text-gray-500"}`}>
+                      <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-full shrink-0 ml-1 ${activeCategory === cat ? "bg-white/30 text-white" : "bg-slate-100 text-slate-400"}`}>
                         {count}
                       </span>
                     </button>
@@ -228,10 +236,20 @@ export default function ShopPage() {
               </nav>
 
               {/* Shop contact mini card */}
-              <div className="p-3 border-t border-gray-100 mt-1">
-                <p className="text-[10px] font-bold text-whoosh-muted uppercase tracking-wide mb-2">Shop Info</p>
-                <p className="text-xs text-whoosh-muted">{shop.address}</p>
-                <p className="text-xs text-whoosh-muted mt-1">{shop.openTime} – {shop.closeTime}</p>
+              <div className="p-4 border-t border-slate-100 mt-1">
+                <p className="text-[10px] font-extrabold text-whoosh-purple uppercase tracking-widest mb-2">Shop Info</p>
+                <div className="flex items-start gap-2 mb-2">
+                  <div className="icon-tile icon-tile-purple w-7 h-7 shrink-0">
+                    <MapPin className="w-3.5 h-3.5" />
+                  </div>
+                  <p className="text-xs text-whoosh-muted leading-relaxed">{shop.address}</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="icon-tile icon-tile-mint w-7 h-7 shrink-0">
+                    <Clock className="w-3.5 h-3.5" />
+                  </div>
+                  <p className="text-xs text-whoosh-muted">{shop.openTime} – {shop.closeTime}</p>
+                </div>
               </div>
             </div>
           </aside>
@@ -239,18 +257,18 @@ export default function ShopPage() {
           {/* Right: Products */}
           <div className="flex-1 min-w-0">
             {/* Search bar */}
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <div className="relative mb-6 bg-slate-50 rounded-2xl border border-slate-200 focus-within:border-whoosh-purple focus-within:bg-white focus-within:shadow-ring transition-all duration-200">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder={`Search products in ${shop.name}...`}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-10 py-3 rounded-2xl bg-white border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 shadow-sm font-medium text-whoosh-dark placeholder:text-gray-400"
+                className="w-full pl-11 pr-10 py-3.5 rounded-2xl bg-transparent border-0 text-sm focus:outline-none font-medium text-whoosh-dark placeholder:text-slate-400"
               />
               {search && (
-                <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full">
-                  <X className="w-4 h-4 text-gray-400" />
+                <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 hover:bg-slate-100 rounded-full transition-all duration-200">
+                  <X className="w-4 h-4 text-slate-400" />
                 </button>
               )}
             </div>
@@ -261,7 +279,7 @@ export default function ShopPage() {
                 <button
                   key={cat}
                   onClick={() => scrollToCategory(cat)}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${activeCategory === cat ? "bg-whoosh-orange text-white border-whoosh-orange" : "bg-white text-whoosh-muted border-gray-200"}`}
+                  className={`shrink-0 transition-all duration-200 ${activeCategory === cat ? "chip chip-purple !bg-whoosh-purple !text-white" : "chip"}`}
                 >
                   {cat}
                 </button>
@@ -272,12 +290,16 @@ export default function ShopPage() {
               /* Search results */
               <div>
                 <p className="text-sm text-whoosh-muted mb-4">
-                  <span className="font-bold text-whoosh-dark">{filteredProducts.length}</span> results for &ldquo;{search}&rdquo;
+                  <span className="font-extrabold text-whoosh-dark">{filteredProducts.length}</span> results for &ldquo;{search}&rdquo;
                 </p>
                 {filteredProducts.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Package className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-                    <p className="text-whoosh-muted font-medium">No products found</p>
+                  <div className="text-center py-16 card">
+                    <div className="icon-tile icon-tile-purple mx-auto mb-4 w-14 h-14">
+                      <Package className="w-6 h-6" />
+                    </div>
+                    <p className="text-whoosh-dark font-extrabold tracking-tight mb-1">No products found</p>
+                    <p className="text-whoosh-muted text-sm mb-4">Try a different search term</p>
+                    <button onClick={() => setSearch("")} className="btn-primary">Clear search</button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -302,10 +324,10 @@ export default function ShopPage() {
                       {/* Category heading */}
                       <div className="flex items-center justify-between mb-4">
                         <div>
-                          <h2 className="text-lg font-black text-whoosh-dark">{cat}</h2>
+                          <h2 className="font-display text-xl font-extrabold tracking-tight text-whoosh-dark">{cat}</h2>
                           <p className="text-xs text-whoosh-muted">{catProducts.length} items</p>
                         </div>
-                        <div className="h-0.5 flex-1 mx-4 bg-gray-100 rounded" />
+                        <div className="h-0.5 flex-1 mx-4 bg-gradient-to-r from-whoosh-purple/30 to-transparent rounded" />
                       </div>
 
                       {/* Products grid */}
@@ -321,12 +343,14 @@ export default function ShopPage() {
             )}
 
             {/* Info footer */}
-            <div className="mt-10 bg-orange-50 rounded-2xl p-5 border border-orange-100 flex gap-3">
-              <Info className="w-5 h-5 text-whoosh-orange shrink-0 mt-0.5" />
+            <div className="mt-10 card p-5 flex gap-4 border border-whoosh-purple/10">
+              <div className="icon-tile icon-tile-mint shrink-0">
+                <Info className="w-5 h-5" />
+              </div>
               <div className="text-sm">
-                <p className="font-bold text-whoosh-dark mb-1">Delivery & Pricing Info</p>
+                <p className="font-extrabold tracking-tight text-whoosh-dark mb-1">Delivery & Pricing Info</p>
                 <p className="text-whoosh-muted leading-relaxed">
-                  All deliveries are <strong className="text-whoosh-green">FREE</strong> — Consumers never pay a delivery charge on Whoosh. Minimum order ₹{shop.minOrder}. Prices may vary slightly from in-store.
+                  All deliveries are <strong className="text-whoosh-green-dark">FREE</strong> — Consumers never pay a delivery charge on Whoosh. Minimum order ₹{shop.minOrder}. Prices may vary slightly from in-store.
                 </p>
               </div>
             </div>
@@ -339,13 +363,19 @@ export default function ShopPage() {
         <div className="cart-float">
           <button
             onClick={() => setShowCart(true)}
-            className="flex items-center gap-3 bg-whoosh-orange hover:bg-orange-500 text-white px-5 py-3.5 rounded-2xl shadow-orange font-bold text-sm transition-all hover:scale-105 active:scale-95"
+            className="relative flex items-center gap-3 bg-whoosh-purple hover:bg-whoosh-purple-dark text-white px-5 py-4 rounded-3xl shadow-purple-lg font-extrabold text-sm transition-all duration-200 hover:scale-105 active:scale-95"
           >
-            <ShoppingCart className="w-5 h-5" />
-            <div className="text-left">
-              <div>{cartTotal} item{cartTotal > 1 ? "s" : ""}</div>
-              <div className="text-xs opacity-90">₹{cartValue} · Free Delivery</div>
+            <div className="icon-tile bg-white/15 text-white w-9 h-9">
+              <ShoppingCart className="w-5 h-5" />
             </div>
+            <div className="text-left tracking-tight">
+              <div>{cartTotal} item{cartTotal > 1 ? "s" : ""}</div>
+              <div className="text-xs opacity-90 font-semibold">₹{cartValue} · Free Delivery</div>
+            </div>
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-whoosh-green opacity-75" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-whoosh-green ring-2 ring-white" />
+            </span>
           </button>
         </div>
       )}
@@ -363,25 +393,25 @@ export default function ShopPage() {
       )}
 
       {/* Sahayak order via WhatsApp CTA (mobile bottom bar) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-3 flex gap-2 z-40">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-100 p-3 flex gap-2 z-40 shadow-card">
         <a
           href={`https://wa.me/${shop.whatsapp}?text=Hello! I want to order from ${shop.name} via Whoosh.`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2 bg-green-500 text-white py-3 rounded-2xl font-semibold text-sm"
+          className="flex-1 flex items-center justify-center gap-2 bg-whoosh-green hover:bg-whoosh-green-dark text-white py-3 rounded-2xl font-extrabold text-sm shadow-green transition-all duration-200 active:scale-95"
         >
           <MessageCircle className="w-4 h-4" />
-          WhatsApp Order
+          WhatsApp
         </a>
         {cartTotal === 0 ? (
-          <button className="flex-1 flex items-center justify-center gap-2 bg-whoosh-orange text-white py-3 rounded-2xl font-semibold text-sm">
-            <Bot className="w-4 h-4" />
+          <button className="flex-1 flex items-center justify-center gap-2 btn-primary !rounded-2xl !py-3">
+            <Sparkles className="w-4 h-4" />
             Ask Sahayak
           </button>
         ) : (
           <button
             onClick={() => setShowCart(true)}
-            className="flex-1 flex items-center justify-center gap-2 bg-whoosh-orange text-white py-3 rounded-2xl font-semibold text-sm"
+            className="flex-1 flex items-center justify-center gap-2 btn-primary !rounded-2xl !py-3"
           >
             <ShoppingCart className="w-4 h-4" />
             Cart ({cartTotal}) · ₹{cartValue}

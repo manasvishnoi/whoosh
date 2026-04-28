@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
-  Bot, Send, Zap, RotateCcw, ArrowLeft, Sparkles,
-  ShoppingCart, Pill, Store, Clock, Star, MessageCircle,
+  Send, RotateCcw, ArrowLeft, Sparkles,
+  ShoppingBag, Pill, Store, Clock, Star, Mic, Bike,
 } from "lucide-react";
 import { useLang } from "@/context/LanguageContext";
 import { renderMarkdown } from "@/lib/renderMarkdown";
@@ -43,21 +43,43 @@ const WELCOME_HI = `नमस्ते! 🙏 मैं **सहायक** ह�
 
 const QUICK_PROMPTS_EN = [
   { icon: Store,        text: "Shops open near me right now" },
-  { icon: ShoppingCart, text: "Order atta 5kg, dal 1kg" },
+  { icon: ShoppingBag,  text: "Order atta 5kg, dal 1kg" },
   { icon: Pill,         text: "I need Paracetamol 500mg" },
   { icon: Clock,        text: "Fastest delivery available?" },
   { icon: Star,         text: "Best rated kirana in Aminabad" },
-  { icon: Zap,          text: "Cheapest milk 1L near me" },
+  { icon: Sparkles,     text: "Cheapest milk 1L near me" },
 ];
 
 const QUICK_PROMPTS_HI = [
   { icon: Store,        text: "अभी पास में कौन सी दुकानें खुली हैं?" },
-  { icon: ShoppingCart, text: "5 किलो आटा, 1 किलो दाल चाहिए" },
+  { icon: ShoppingBag,  text: "5 किलो आटा, 1 किलो दाल चाहिए" },
   { icon: Pill,         text: "Paracetamol 500mg कहाँ मिलेगी?" },
   { icon: Clock,        text: "सबसे जल्दी डिलीवरी कहाँ से होगी?" },
   { icon: Star,         text: "अमीनाबाद में सबसे अच्छी किराना दुकान" },
-  { icon: Zap,          text: "पास में सबसे सस्ता दूध 1L" },
+  { icon: Sparkles,     text: "पास में सबसे सस्ता दूध 1L" },
 ];
+
+/* Custom Sahayak avatar — gradient ring + sparkle */
+function SahayakAvatar({ size = 40 }: { size?: number }) {
+  return (
+    <span
+      className="relative flex items-center justify-center rounded-full shrink-0"
+      style={{
+        width: size,
+        height: size,
+        background: "conic-gradient(from 200deg, #5D3FD3, #8366E4, #00D395, #5D3FD3)",
+      }}
+    >
+      <span className="absolute inset-[2px] rounded-full bg-gradient-to-br from-whoosh-purple to-whoosh-purple-dark flex items-center justify-center">
+        <Sparkles
+          style={{ width: size * 0.5, height: size * 0.5 }}
+          className="text-white"
+          strokeWidth={2.4}
+        />
+      </span>
+    </span>
+  );
+}
 
 export default function SahayakPage() {
   const { lang, toggleLang } = useLang();
@@ -70,13 +92,8 @@ export default function SahayakPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => { inputRef.current?.focus(); }, []);
 
   async function sendMessage(text?: string) {
     const userText = (text ?? input).trim();
@@ -96,13 +113,10 @@ export default function SahayakPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: history, language: lang, userLocation: "Lucknow, UP" }),
       });
-
       if (!res.ok || !res.body) throw new Error("Failed");
-
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let fullText = "";
-
       setMessages((prev) => prev.map((m, i) => i === prev.length - 1 ? { ...m, loading: false, content: "▌" } : m));
 
       while (true) {
@@ -162,51 +176,52 @@ export default function SahayakPage() {
   const showQuickPrompts = messages.length <= 1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-purple-50 flex flex-col">
-
-      {/* Top bar */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-20 shadow-sm">
-        <Link href="/shops" className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-[#64748B] hover:text-[#1E293B]">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50/50 to-white flex flex-col">
+      {/* Top bar — dark + purple */}
+      <header
+        className="relative px-4 py-3.5 flex items-center gap-3 sticky top-0 z-20 text-white"
+        style={{ background: "linear-gradient(135deg, #1B1245 0%, #2A1B66 40%, #5D3FD3 100%)" }}
+      >
+        <div className="absolute inset-0 bg-mesh-purple opacity-50 mix-blend-screen pointer-events-none" />
+        <Link
+          href="/shops"
+          className="relative p-2 rounded-xl hover:bg-white/15 transition-colors text-white/90"
+        >
           <ArrowLeft className="w-5 h-5" />
         </Link>
 
         {/* Agent identity */}
-        <div className="flex items-center gap-3 flex-1">
-          <div className="relative">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF8C42] to-[#E87030] flex items-center justify-center shadow-orange">
-              <Bot className="w-6 h-6 text-white" />
-            </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400 border-2 border-white" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <p className="font-black text-[#1E293B] text-base">Sahayak</p>
-              <span className="text-xs bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block" />
-                Online
+        <div className="relative flex items-center gap-3 flex-1">
+          <SahayakAvatar size={42} />
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="font-extrabold text-white text-base tracking-tight">Sahayak</p>
+              <span className="hindi text-xs text-purple-200">सहायक</span>
+              <span className="text-[10px] bg-whoosh-green/20 text-whoosh-green border border-whoosh-green/40 font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-whoosh-green animate-pulse inline-block" />
+                AI · Online
               </span>
             </div>
-            <p className="text-xs text-[#64748B]">
-              {lang === "hi" ? "आपका AI शॉपिंग असिस्टेंट • Whoosh" : "Your AI Shopping Assistant • Whoosh"}
+            <p className="text-[11px] text-purple-100/90 font-medium">
+              {lang === "hi" ? "आपका AI शॉपिंग असिस्टेंट · Whoosh" : "Your AI Shopping Assistant · Whoosh"}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Language toggle */}
+        <div className="relative flex items-center gap-2">
           <button
             onClick={toggleLang}
-            className="px-3 py-1.5 rounded-xl text-xs font-bold border transition-all duration-200 active:scale-95"
-            style={lang === "hi"
-              ? { background: "#6B46C1", color: "#fff", borderColor: "#6B46C1" }
-              : { background: "#fff", color: "#6B46C1", borderColor: "#DDD6FE" }
-            }
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all duration-200 active:scale-95 backdrop-blur-sm ${
+              lang === "hi"
+                ? "bg-white text-whoosh-purple border-white"
+                : "bg-white/15 text-white border-white/30 hover:bg-white/25"
+            }`}
           >
             {lang === "en" ? "हिं" : "EN"}
           </button>
           <button
             onClick={resetChat}
-            className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-[#64748B]"
+            className="p-2 rounded-xl bg-white/15 hover:bg-white/25 transition-colors text-white backdrop-blur-sm"
             title="Reset chat"
           >
             <RotateCcw className="w-4 h-4" />
@@ -215,15 +230,17 @@ export default function SahayakPage() {
       </header>
 
       {/* Hero strip */}
-      <div className="bg-gradient-to-r from-[#FF8C42] to-[#E87030] px-6 py-4 flex items-center gap-4">
-        <Sparkles className="w-5 h-5 text-white/80 shrink-0" />
-        <p className="text-white text-sm font-semibold">
+      <div className="bg-cream border-b border-whoosh-orange/15 px-6 py-3.5 flex items-center gap-3">
+        <span className="icon-tile icon-tile-orange w-9 h-9 rounded-xl">
+          <Sparkles className="w-4 h-4" strokeWidth={2.4} />
+        </span>
+        <p className="text-whoosh-dark text-sm font-semibold flex-1 leading-tight">
           {lang === "hi"
             ? "हिंदी या English — जैसे चाहें बात करें। मुफ्त डिलीवरी हर ऑर्डर पर।"
             : "Talk in Hindi or English — however you like. Free delivery on every order."}
         </p>
-        <Link href="/shops" className="shrink-0 bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1">
-          <ShoppingCart className="w-3.5 h-3.5" />
+        <Link href="/shops" className="shrink-0 chip chip-purple hover:bg-purple-100 transition-colors">
+          <ShoppingBag className="w-3.5 h-3.5" />
           {lang === "hi" ? "दुकानें" : "Browse"}
         </Link>
       </div>
@@ -231,27 +248,34 @@ export default function SahayakPage() {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 max-w-2xl mx-auto w-full">
         {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div key={i} className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             {msg.role === "assistant" && (
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#FF8C42] to-[#E87030] flex items-center justify-center shrink-0 mt-1 shadow-sm">
-                <Zap className="w-4 h-4 text-white fill-white" />
+              <div className="mt-1">
+                <SahayakAvatar size={32} />
               </div>
             )}
             <div className="max-w-[80%] sm:max-w-[70%] flex flex-col gap-0">
               {(msg.loading || msg.content) && (
-                <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${
-                  msg.role === "user"
-                    ? "bg-[#FF8C42] text-white rounded-tr-sm"
-                    : "bg-white text-[#1E293B] border border-gray-100 rounded-tl-sm"
-                }`}>
+                <div
+                  className={`text-sm leading-relaxed whitespace-pre-wrap ${
+                    msg.role === "user" ? "bubble-user" : "bubble-bot"
+                  }`}
+                >
                   {msg.loading ? (
                     <div className="flex gap-1.5 items-center py-1">
                       {[0, 150, 300].map((delay) => (
-                        <span key={delay} className="w-2 h-2 rounded-full bg-orange-300 animate-bounce"
-                          style={{ animationDelay: `${delay}ms` }} />
+                        <span
+                          key={delay}
+                          className={`w-2 h-2 rounded-full bg-whoosh-purple animate-bounce`}
+                          style={{ animationDelay: `${delay}ms`, opacity: 0.4 + delay / 600 }}
+                        />
                       ))}
                     </div>
-                  ) : msg.role === "user" ? msg.content : renderMarkdown(msg.content)}
+                  ) : msg.role === "user" ? (
+                    msg.content
+                  ) : (
+                    renderMarkdown(msg.content)
+                  )}
                 </div>
               )}
               {msg.order && msg.orderStatus && (
@@ -264,7 +288,7 @@ export default function SahayakPage() {
               )}
             </div>
             {msg.role === "user" && (
-              <div className="w-8 h-8 rounded-xl bg-[#6B46C1] flex items-center justify-center shrink-0 mt-1 text-white text-xs font-bold shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-whoosh-dark flex items-center justify-center shrink-0 mt-1 text-white text-xs font-extrabold shadow-soft border-2 border-whoosh-purple/30">
                 U
               </div>
             )}
@@ -274,20 +298,21 @@ export default function SahayakPage() {
         {/* Quick prompts */}
         {showQuickPrompts && (
           <div className="mt-6">
-            <p className="text-xs text-[#64748B] font-semibold mb-3 text-center uppercase tracking-wide">
+            <p className="text-xs text-whoosh-muted font-extrabold mb-3 text-center uppercase tracking-wider flex items-center justify-center gap-2">
+              <Sparkles className="w-3.5 h-3.5 text-whoosh-purple" />
               {lang === "hi" ? "जल्दी पूछें" : "Quick ask"}
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {quickPrompts.map(({ icon: Icon, text }) => (
                 <button
                   key={text}
                   onClick={() => sendMessage(text)}
-                  className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-gray-100 hover:border-orange-200 hover:bg-orange-50/50 transition-all text-left group shadow-sm active:scale-95"
+                  className="flex items-center gap-3 p-3 bg-white rounded-2xl border border-slate-200 hover:border-whoosh-purple hover:bg-whoosh-purple-light/40 transition-all text-left group shadow-soft active:scale-[0.98]"
                 >
-                  <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center shrink-0 group-hover:bg-orange-100 transition-colors">
-                    <Icon className="w-4 h-4 text-[#FF8C42]" />
-                  </div>
-                  <span className="text-sm text-[#1E293B] font-medium leading-tight">{text}</span>
+                  <span className="icon-tile icon-tile-purple w-9 h-9 group-hover:icon-tile-solid-purple">
+                    <Icon className="w-4 h-4" strokeWidth={2.2} />
+                  </span>
+                  <span className="text-sm text-whoosh-dark font-semibold leading-tight flex-1">{text}</span>
                 </button>
               ))}
             </div>
@@ -298,33 +323,42 @@ export default function SahayakPage() {
       </div>
 
       {/* Input bar */}
-      <div className="sticky bottom-0 bg-white/90 backdrop-blur-md border-t border-gray-100 px-4 py-3 shadow-lg">
+      <div className="sticky bottom-0 bg-white/95 backdrop-blur-md border-t border-slate-100 px-4 py-3 shadow-card">
         <div className="max-w-2xl mx-auto">
-          <div className="flex gap-2 items-center">
-            <div className="flex-1 relative">
-              <MessageCircle className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                placeholder={lang === "hi" ? "कुछ भी पूछें — हिंदी या English..." : "Ask anything — Hindi or English..."}
-                disabled={loading}
-                className="w-full pl-10 pr-4 py-3 rounded-2xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 text-[#1E293B] placeholder:text-gray-400 disabled:opacity-60 bg-white"
-              />
-            </div>
+          <div className="flex gap-2 items-center bg-slate-50 rounded-2xl border border-slate-200 focus-within:border-whoosh-purple focus-within:bg-white focus-within:shadow-ring transition-all px-2">
+            <Sparkles className="w-4 h-4 text-whoosh-purple ml-2 shrink-0" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
+              placeholder={lang === "hi" ? "कुछ भी पूछें — हिंदी या English..." : "Ask Sahayak — Hindi or English..."}
+              disabled={loading}
+              className="flex-1 px-2 py-3 bg-transparent text-sm focus:outline-none text-whoosh-dark placeholder:text-slate-400 disabled:opacity-60"
+            />
+            <button
+              type="button"
+              disabled
+              className="w-9 h-9 rounded-xl text-slate-400 flex items-center justify-center"
+              aria-label="Voice (coming soon)"
+              title="Voice (coming soon)"
+            >
+              <Mic className="w-4 h-4" />
+            </button>
             <button
               onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
-              className="w-11 h-11 rounded-2xl bg-[#FF8C42] text-white flex items-center justify-center hover:bg-orange-500 transition-all shadow-orange disabled:opacity-40 disabled:cursor-not-allowed active:scale-90 shrink-0"
+              className="w-10 h-10 rounded-xl bg-whoosh-purple text-white flex items-center justify-center hover:brightness-110 transition-all shadow-purple disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none active:scale-90 shrink-0"
             >
               <Send className="w-4 h-4" />
             </button>
           </div>
-          <p className="text-[10px] text-[#94A3B8] text-center mt-2 flex items-center justify-center gap-1">
-            <Zap className="w-2.5 h-2.5 text-[#10B981] fill-[#10B981]" />
-            {lang === "hi" ? "Groq AI द्वारा संचालित • हर ऑर्डर पर मुफ्त डिलीवरी" : "Powered by Groq AI • Free delivery on every order"}
+          <p className="text-[10px] text-whoosh-muted text-center mt-2 flex items-center justify-center gap-1">
+            <Bike className="w-2.5 h-2.5 text-whoosh-green" />
+            {lang === "hi"
+              ? "Claude AI द्वारा संचालित · हर ऑर्डर पर मुफ्त डिलीवरी"
+              : "Powered by Claude AI · Free delivery on every order"}
           </p>
         </div>
       </div>

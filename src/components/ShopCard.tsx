@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Star, Clock, MapPin, Zap, MessageCircle, ArrowRight } from "lucide-react";
+import { Star, Clock, MapPin, MessageCircle, ArrowUpRight, Bike } from "lucide-react";
 import type { Shop } from "@/lib/data";
 import { useLang } from "@/context/LanguageContext";
 
@@ -10,9 +10,9 @@ interface ShopCardProps {
 }
 
 const PLAN_STYLES: Record<"starter" | "pro" | "elite", { label: string; bg: string; text: string }> = {
-  elite: { label: "Elite", bg: "bg-purple-100", text: "text-purple-700" },
-  pro:   { label: "Pro",   bg: "bg-orange-100", text: "text-orange-700" },
-  starter: { label: "Starter", bg: "bg-slate-100", text: "text-slate-600" },
+  elite:   { label: "Elite",   bg: "bg-whoosh-purple",       text: "text-white" },
+  pro:     { label: "Pro",     bg: "bg-whoosh-green-light",  text: "text-whoosh-green-dark" },
+  starter: { label: "Starter", bg: "bg-slate-100",           text: "text-slate-600" },
 };
 
 export default function ShopCard({ shop }: ShopCardProps) {
@@ -21,77 +21,99 @@ export default function ShopCard({ shop }: ShopCardProps) {
 
   return (
     <Link href={`/shop/${shop.id}`} className="block group">
-      <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm
-        transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-lg group-hover:border-orange-100">
-
+      <div
+        className="bg-white rounded-3xl overflow-hidden border border-slate-100
+                   shadow-soft transition-all duration-300
+                   group-hover:-translate-y-1.5 group-hover:shadow-card-hover
+                   group-hover:border-whoosh-purple/20"
+      >
         {/* Banner */}
-        <div className="relative h-36 overflow-hidden">
+        <div className="relative h-40 overflow-hidden">
           <img
             src={shop.banner}
             alt={shop.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-whoosh-dark/70 via-whoosh-dark/15 to-transparent" />
 
-          {/* Status */}
-          <div className={`absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-sm
-            ${shop.isOpen ? "bg-emerald-500/90 text-white" : "bg-black/60 text-gray-300"}`}>
-            {shop.isOpen ? `● ${T.open}` : T.closed}
+          {/* Top row */}
+          <div className="absolute top-3 inset-x-3 flex items-start justify-between">
+            <span className={`${plan.bg} ${plan.text} px-2.5 py-1 rounded-full text-[10px] font-extrabold tracking-wide backdrop-blur-md shadow-sm`}>
+              {plan.label.toUpperCase()}
+            </span>
+            <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold backdrop-blur-md flex items-center gap-1
+              ${shop.isOpen
+                ? "bg-whoosh-green/95 text-white shadow-green"
+                : "bg-whoosh-dark/70 text-slate-200"}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${shop.isOpen ? "bg-white animate-pulse2" : "bg-slate-400"}`} />
+              {shop.isOpen ? T.open : T.closed}
+            </span>
           </div>
 
-          {/* Plan */}
-          <div className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-sm bg-white/90 ${plan.text}`}>
-            {plan.label}
-          </div>
+          {/* Free delivery ribbon */}
+          <span className="absolute bottom-3 right-3 chip chip-mint">
+            <Bike className="w-3 h-3" />
+            FREE
+          </span>
 
           {/* Logo */}
           <img
             src={shop.logo}
             alt=""
-            className="absolute bottom-0 left-3 translate-y-1/2 w-12 h-12 rounded-xl border-2 border-white shadow-md object-cover bg-white"
+            className="absolute bottom-0 left-4 translate-y-1/2 w-14 h-14 rounded-2xl border-[3px] border-white shadow-lg object-cover bg-white"
           />
         </div>
 
         {/* Content */}
-        <div className="p-3 pt-8">
-          <div className="flex items-start justify-between gap-2 mb-2">
+        <div className="px-4 pt-9 pb-4">
+          <div className="flex items-start justify-between gap-2 mb-2.5">
             <div className="min-w-0">
-              <h3 className="font-bold text-[#0F172A] text-sm leading-tight truncate">{shop.name}</h3>
-              <p className="text-[10px] text-[#94A3B8] hindi truncate mt-0.5">{shop.hindiName}</p>
+              <h3 className="font-extrabold text-whoosh-dark text-[15px] leading-tight truncate tracking-tight">
+                {shop.name}
+              </h3>
+              <p className="text-[11px] text-whoosh-muted hindi truncate mt-0.5">{shop.hindiName}</p>
             </div>
-            <div className="flex items-center gap-0.5 shrink-0 bg-emerald-50 px-1.5 py-1 rounded-lg">
-              <Star className="w-3 h-3 text-emerald-600 fill-emerald-600" />
-              <span className="text-xs font-black text-emerald-700">{shop.rating}</span>
+            <div className="flex items-center gap-1 shrink-0 bg-whoosh-green-light px-2 py-1 rounded-xl border border-whoosh-green/20">
+              <Star className="w-3 h-3 text-whoosh-green-dark fill-whoosh-green" />
+              <span className="text-xs font-extrabold text-whoosh-green-dark">{shop.rating}</span>
             </div>
           </div>
 
           {/* Tags */}
-          <div className="flex gap-1 flex-wrap mb-2.5">
+          <div className="flex gap-1.5 flex-wrap mb-3">
             {shop.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="text-[10px] text-[#64748B] bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-full">
+              <span
+                key={tag}
+                className="text-[10px] text-slate-600 bg-slate-50 border border-slate-200/60 px-2 py-0.5 rounded-full font-semibold"
+              >
                 {tag}
               </span>
             ))}
           </div>
 
           {/* Meta */}
-          <div className="flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2.5 text-[#64748B]">
-              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{shop.eta}</span>
-              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{shop.distance}</span>
+          <div className="flex items-center justify-between text-xs pb-3 border-b border-slate-100">
+            <div className="flex items-center gap-3 text-whoosh-muted">
+              <span className="flex items-center gap-1 font-semibold">
+                <Clock className="w-3.5 h-3.5 text-whoosh-purple" />
+                {shop.eta}
+              </span>
+              <span className="flex items-center gap-1 font-semibold">
+                <MapPin className="w-3.5 h-3.5 text-whoosh-orange" />
+                {shop.distance}
+              </span>
             </div>
-            <span className="flex items-center gap-0.5 font-bold text-emerald-600">
-              <Zap className="w-3 h-3 fill-emerald-500 text-emerald-500" />Free
-            </span>
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-gray-50">
-            <span className="flex items-center gap-1 text-[10px] text-[#64748B]">
-              <MessageCircle className="w-3 h-3 text-green-500" />WhatsApp
+          <div className="flex items-center justify-between mt-3">
+            <span className="flex items-center gap-1.5 text-[11px] text-whoosh-muted font-semibold">
+              <MessageCircle className="w-3.5 h-3.5 text-whoosh-green" />
+              WhatsApp
             </span>
-            <span className="flex items-center gap-0.5 text-[#FF8C42] font-bold text-xs group-hover:gap-1 transition-all duration-150">
-              Shop now <ArrowRight className="w-3 h-3" />
+            <span className="flex items-center gap-1 text-whoosh-purple font-extrabold text-xs group-hover:gap-1.5 transition-all duration-200">
+              Shop now
+              <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </span>
           </div>
         </div>

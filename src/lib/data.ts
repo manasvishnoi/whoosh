@@ -56,7 +56,7 @@ export type Category = {
 };
 
 export const CATEGORIES: Category[] = [
-  { id: "groceries", name: "Groceries", hindiName: "किराना", emoji: "🛒", color: "#FF8C42" },
+  { id: "groceries", name: "Groceries", hindiName: "किराना", emoji: "🛒", color: "#5D3FD3" },
   { id: "dairy", name: "Dairy & Eggs", hindiName: "दूध व अंडे", emoji: "🥛", color: "#3B82F6" },
   { id: "snacks", name: "Snacks & Biscuits", hindiName: "नाश्ता", emoji: "🍪", color: "#F59E0B" },
   { id: "beverages", name: "Beverages", hindiName: "पेय पदार्थ", emoji: "🥤", color: "#10B981" },
@@ -72,9 +72,9 @@ export const SHOPS: Shop[] = [
     name: "Rajesh General Store",
     hindiName: "राजेश जनरल स्टोर",
     owner: "Rajesh Gupta",
-    avatar: "https://ui-avatars.com/api/?name=Rajesh+Gupta&background=FF8C42&color=fff&size=100",
+    avatar: "https://ui-avatars.com/api/?name=Rajesh+Gupta&background=5D3FD3&color=fff&size=100",
     banner: "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=800&q=80",
-    logo: "https://ui-avatars.com/api/?name=RG&background=FF8C42&color=fff&size=80&bold=true",
+    logo: "https://ui-avatars.com/api/?name=RG&background=5D3FD3&color=fff&size=80&bold=true",
     category: "General Store",
     tags: ["Groceries", "Dairy", "Snacks", "Household"],
     rating: 4.7,
@@ -308,7 +308,7 @@ export const TESTIMONIALS = [
     area: "Gomti Nagar",
     text: "I used to pay ₹200 monthly in delivery fees on Blinkit. Now I order from Rajesh bhai's shop on Whoosh — same speed, zero delivery fee. It's been 3 months and I haven't opened Blinkit once.",
     rating: 5,
-    avatar: "https://ui-avatars.com/api/?name=Priya+Mishra&background=FF8C42&color=fff",
+    avatar: "https://ui-avatars.com/api/?name=Priya+Mishra&background=5D3FD3&color=fff",
   },
   {
     name: "Rajesh Gupta",
